@@ -1,0 +1,8 @@
+RABAR FONT SETUP (user-provided font, not redistributed in project ZIP)
+
+Copy your own Rabar_021.ttf file into this assets/fonts/ folder.
+The site CSS already loads it at ../fonts/Rabar_021.ttf.
+Alternatively, install your owned Rabar_021 font locally on your PC.
+Refresh the browser with Ctrl+F5 after installation.
+
+Kurdish: فایلی Rabar_021.ttf ـی خۆت بخە ناو assets/fonts/، پاشان پەڕەکە بە Ctrl+F5 نوێ بکەرەوە.
