@@ -1,0 +1,73 @@
+QA REPORT - 2026-10-30 Professional Institution / Approval / Finance Review
+============================================================================
+
+STATIC VALIDATION COMPLETED
+---------------------------
+- PHP syntax: 96 PHP files linted successfully.
+- JavaScript syntax: 12 JavaScript files passed node --check.
+- Inline Department Requests JavaScript passed node --check after extraction.
+- Literal t('...') translation calls: 544; unresolved English fallback keys: 0.
+- Professional Kurdish translation keys: 139; duplicates: 0.
+- Professional English translation keys: 139; duplicates: 0.
+- bind_param static argument-count checks: 231 calls; mismatches: 0.
+- POST forms checked: 57; forms without a CSRF token: 0.
+- POST/state-changing API review: only api/search.php lacks direct endpoint verify_csrf, because it is a read-only search operation and does not mutate state.
+- Logout links using GET: 0. User/admin logout endpoints are POST-only and verify CSRF.
+- Fresh schema: 29 CREATE TABLE statements; duplicate table names: 0.
+- Fresh schema: 70 named foreign-key constraints; duplicate constraint names: 0.
+- Foreign keys referencing missing tables: 0.
+- Fresh-schema tables without corresponding DROP TABLE IF EXISTS entries: 0.
+- Removed legacy api/set-language.php references remaining: 0.
+- git diff whitespace check: passed after migration EOF normalization.
+
+PROFESSIONAL WORKFLOW CHECKS VERIFIED IN CODE
+---------------------------------------------
+- A department head cannot directly add/remove employees through OrganizationController; the backend returns manager_approval_required.
+- Department-head request submission derives department_id from the authenticated admin session rather than trusting request input.
+- Department-head request history is scoped to that head's department.
+- Department-head dashboard pending-request count is scoped to that department instead of exposing the institution-wide queue.
+- Institution Manager sees institution-wide request/finance queues.
+- Existing employee add/remove targets are rechecked under transaction locking during manager approval.
+- Department heads cannot request an employee already active in another department.
+- New Staff Requisition supports requesting a genuinely new staff need without selecting an existing account.
+- Auto-executed staffing approvals are recorded as completed with executed_at.
+- Procurement/budget requests remain approved until Finance completes the linked disbursement.
+- Rejection of a department request or Finance transaction requires a review note.
+- Finance linked-request creation uses row locking and a second in-process check before insertion.
+- Only approved Finance entries affect totals/balance.
+- Finance application UI has no edit/delete action for approved entries.
+- High-impact organization, request, and Finance actions are written to administrative_audit_log.
+- Audit Log is restricted to Institution Manager / super_admin.
+
+ORGANIZATION / ACCOUNT CHECKS
+-----------------------------
+- Default institution departments have explicit responsibility text in the fresh schema and upgrade migration.
+- Newly created departments accept an explicit responsibilities field.
+- Only non-suspended official Staff records with a linked platform account can be candidates for department administration.
+- Department-admin login uses the linked official platform credentials.
+- Inactive departments or inactive parent departments deny department access without destroying assignments.
+- Suspended registry-linked users are denied normal authenticated access.
+
+SOCIAL / FILE LIFECYCLE CHECKS
+------------------------------
+- Incoming/accepted friend lists now filter suspended institutional users.
+- Profile friend counts/previews filter suspended accounts; previews also respect viewer block relationships.
+- Group attachment files are collected before group deletion and removed only after the database delete commits.
+- The same attachment cleanup applies when the final member leaves and the empty group is automatically deleted.
+- Search remains read-only even though it uses POST for AJAX input.
+
+SECURITY / CONFIGURATION CHECKS
+-------------------------------
+- All detected HTML POST forms include csrf_input()/csrf_token.
+- User and admin logout are POST-only with CSRF verification.
+- Raw database connection errors are no longer shown to end users.
+- DB credentials can come from CHATAPP_DB_HOST / CHATAPP_DB_USER / CHATAPP_DB_PASS / CHATAPP_DB_NAME, with backward-compatible local defaults.
+- No application references remain to the removed unused api/set-language.php endpoint.
+
+DATABASE VALIDATION LIMITATION
+------------------------------
+A live MySQL/MariaDB server/client and PHP MySQL driver are not available in this execution environment. Therefore runtime SQL integration/migration execution could not be performed here. The fresh schema and migrations were structurally/static checked, but deployment should begin with a database backup and migration on a staging/test copy when possible.
+
+PACKAGE VALIDATION
+------------------
+The delivered ZIP is generated from the reviewed working tree, excludes internal .git review metadata, and is integrity-tested after creation.

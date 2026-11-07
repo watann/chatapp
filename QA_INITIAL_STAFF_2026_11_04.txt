@@ -1,0 +1,36 @@
+CHATAPP — BOOTSTRAP AND REGISTRY QA (2026-11-04)
+============================================
+
+Changed:
+- Added: admin/initial-staff.php, admin/api/initial-staff.php, api/app/controller/InitialStaffController.php
+- Manager-only, conditional bootstrap for the first Registry staff and first Administration head.
+- Atomic creation of official staff registry record + users account + department admin account + audit log.
+- Auto-creates the two initial staff workplace option labels if required, using existing schema.
+- Bootstrap is not general staff registration and is disabled after both functional staff positions exist.
+- First-run prompts appear on manager dashboard / organization / registry list, with a relevant sidebar link.
+- Staff transfer safety: no implicit department reassignment or accidental demotion of heads through addEmployee.
+- Linked admin session requires existing platform account.
+- Random unique_id generation now checks suspended users too, without weakening user_exists access checks.
+- Updated CSS and cache version for Rabar_021; actual user's font file is not redistributed in the ZIP.
+
+Security/logic notes:
+- Every POST route uses authenticated super-admin + CSRF.
+- Backend role availability rechecked while the manager admin row is locked.
+- Existing identity and email collision checks, with unique DB indexes as final guard.
+- Failed inserts roll back the entire new record/account/permission flow.
+- Regular Registry -> Administration -> Manager approval remains unchanged and mandatory after setup.
+- No new database schema required beyond the previous registry-batch migration.
+
+Verified statically:
+- PHP lint all application PHP files.
+- JavaScript syntax with node --check.
+- All new bind_param call counts reviewed.
+- Unauthorized bootstrap request returns an exception before any DB call.
+- CSS parsed to detect syntax issues.
+- ZIP archive tested for corrupt members, paths and no bundled font.
+
+NOT verified here:
+- Live MySQL/MariaDB schema migration, multi-user concurrent requests,
+  interactive browser session or full end-to-end UI, because php-mysqli,
+  php-mbstring and a database service are not available in this environment.
+  These require localhost testing before production.

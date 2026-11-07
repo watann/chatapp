@@ -1,0 +1,77 @@
+ChatApp institution workflows — Implementation and QA — 2026-11-04
+===================================================================
+
+DELIVERED CHANGES
+- A dedicated study-departments.php page. Students can select only active
+  approved study departments when being added to an official registry list.
+- Cleaned Central Setup: teacher qualification, teacher specialization,
+  staff workplace and organizational setup remain; study departments moved
+  out of the mixed option list.
+- Default Registry Department in organization hierarchy (code: registry).
+- Registration-list workflow with MySQL-backed batches and rows:
+  registry drafting -> administration review/edit -> manager final approval.
+- Registrar and Administration can add/edit/delete rows at their allowed
+  stages. The Administration Head controls its forward/return decision.
+- Final manager approval is a single database transaction for the whole
+  list. Records are not official until it succeeds.
+- History events/notes and distinct pending/returned/approved states.
+- Approvals page contains waiting registry lists, in addition to normal
+  pre-existing department requests.
+- Direct old registration form and endpoint removed/disabled so a person
+  cannot bypass the required list workflow.
+- Existing official record viewing and account-suspension flow preserved.
+- Old pending legacy registration requests are not discarded or deleted.
+
+MIGRATION
+Existing database: back up first; run DATABASE_MIGRATION_2026_11_04.sql
+in the chatapp database AFTER prior migrations. Do not overwrite existing
+DB with chatapp.sql. Fresh database: import chatapp.sql only.
+
+PERMISSIONS
+- Registry staff/head: prepare their own lists and submit to Administration.
+- Student Affairs: prepare student lists.
+- Human Resources: prepare teacher/staff lists.
+- Administration staff: edit rows in submitted lists; may prepare own lists.
+- Administration Head: edit submitted lists and formally forward/return.
+- Institution Manager: view all lists, final approve or return.
+- Finance/academic/IT staff: no registration-list access unless separately
+  assigned to an authorized department with the required rights.
+- An Administration Head may not approve a list that they originally created.
+
+STAGING ACCEPTANCE TESTS (perform with running MySQL/MariaDB)
+[ ] Run migration after a database backup.
+[ ] Verify new Registry department appears in Institution Structure.
+[ ] Assign Registry Head and Staff as official linked staff accounts.
+[ ] Manager creates a study department, student dropdown shows it.
+[ ] Administration Head submits a study-department proposal; before
+    manager approval, the study department does not appear in dropdown.
+[ ] Rejecting a department proposal leaves study department unchanged.
+[ ] Registry Staff creates a 2-student list, fills valid data and submits.
+[ ] Admin Staff edits a student's chosen department and removes another.
+[ ] Admin Head can add and re-edit rows, then forward to manager.
+[ ] Manager can see the pending list in Manager Approvals and inspect it.
+[ ] Manager return sends list back to Administration with a note.
+[ ] Admin Head re-approves modified list, manager final approves.
+[ ] Official records are created only at final approval; generated IDs valid.
+[ ] Manager refreshing/resubmitting approved list cannot insert duplicates.
+[ ] Duplicate identity in one list fails; duplicates of official IDs fail.
+[ ] If any row fails final validation, NO member of the list is created.
+[ ] Finance Staff cannot open any list or post to edit/approve endpoints.
+[ ] Registry Staff cannot send a batch directly to Manager Review.
+[ ] Admin Staff cannot carry out the Administration Head approval action.
+[ ] Administration Head cannot perform the Manager approval action.
+[ ] Teacher registration requires a certificate and specialization.
+[ ] Pre-existing registered users, social pages, finance and academic
+    features work after deployment.
+
+VERIFIED HERE
+- PHP lint: see accompanying QA run notes / all PHP files lint clean.
+- JavaScript parsing: existing JS files node --check clean.
+- New PHP controller role capability matrix was checked via php CLI.
+- All new POST endpoints call verify_csrf, and edit actions validate
+  current stored state under a row lock.
+
+NOT VERIFIED HERE
+- Live MySQL migration, FK creation, multi-session concurrency,
+  end-to-end browser interactions, and actual issuance of IDs on a database.
+  This runtime has no mysqli/mbstring extensions or MySQL server.

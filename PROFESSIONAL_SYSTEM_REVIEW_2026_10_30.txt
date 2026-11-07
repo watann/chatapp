@@ -1,0 +1,57 @@
+PROFESSIONAL SYSTEM REVIEW - EXECUTIVE SUMMARY
+==============================================
+
+Objective
+---------
+Restructure the project so the institution has a real organizational hierarchy; each department has an explicit responsibility scope; department heads request additional staff/resources instead of bypassing management; manager approval is mandatory before request execution; Finance owns institutional receipts/expenses; unnecessary attack surface and logical defects are removed; and significant decisions remain auditable.
+
+Implemented architecture
+------------------------
+1. Institution Manager (legacy DB role: super_admin)
+   - Institutional oversight, department/head assignment, approval/rejection, Finance review, audit access.
+
+2. Departments
+   - Academic Affairs
+   - Finance
+   - Institution Administration
+   - Student Affairs
+   - Human Resources
+   - Information Technology
+   - Custom departments with parent hierarchy and responsibility statement.
+
+3. Department Head
+   - Own-department organizational visibility.
+   - Formal requests only for new staff requisition, existing employee add/remove, resource, procurement, budget, or other needs.
+   - Cannot bypass manager approval by posting directly to the organization action endpoint.
+
+4. Department Staff
+   - Operational access follows department type; no organizational staffing authority.
+
+5. Approval workflow
+   - pending -> approved/rejected/cancelled/completed.
+   - Manager review note retained; rejection reason mandatory.
+   - Staffing changes revalidated at execution time.
+
+6. Finance
+   - Income/expense ledger.
+   - Finance staff/head submissions require manager approval before balance impact.
+   - Approved procurement/budget requests can be linked to exact-value expenses and are completed on approved disbursement.
+
+7. Governance
+   - administrative_audit_log and manager-only Audit Log UI.
+
+Key logical fixes beyond the requested features
+-----------------------------------------------
+- Department heads no longer directly mutate staffing.
+- Staff without an active linked platform account cannot be made a usable department admin/head.
+- Department-head pending-request counts no longer expose global pending counts.
+- Finance linked-request creation is transaction locked against concurrent duplicate processing.
+- Suspended accounts are filtered from friend lists/profile friend views.
+- Deleting an empty/deleted chat group now removes associated stored attachments.
+- Logout is POST + CSRF instead of a state-changing GET.
+- Unused api/set-language.php was removed.
+- DB errors are not exposed to users; DB credentials support environment configuration.
+
+Validation status
+-----------------
+See QA_REPORT.txt for exact static QA counts and the live-DB testing limitation.

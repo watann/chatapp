@@ -1,0 +1,56 @@
+SYSTEM SIMPLIFICATION REVIEW - 2026-10-31
+=========================================
+
+Main problem found
+------------------
+The project had strong functionality, but management was spread over too many pages and several concepts were duplicated: organization structure, official options, department requests, registry work, academic operations and finance each had separate management paths. This made the system harder to learn and made it unclear which changes required institution-level approval.
+
+Simplified model implemented
+----------------------------
+1. Institution Manager
+   - Final authority for institution-level structure, official configuration, registry approvals, department requests and finance approvals.
+   - Uses Manager Approvals as the main decision queue.
+
+2. Department Manager / Head
+   - Has one dedicated My Department page.
+   - Sees only tools relevant to that department.
+   - Sends high-impact changes to the Institution Manager instead of applying them immediately.
+
+3. Central Setup
+   - One organized page for master/configuration additions:
+     * Institution departments
+     * Department manager assignment
+     * Study departments
+     * Study-department heads
+     * Teacher certificate types
+     * Teacher specializations
+     * Staff workplaces
+   - The Administration department head can prepare these changes.
+   - Non-manager changes are queued for Institution Manager approval.
+
+4. Teacher onboarding / registry
+   - Teacher certificate type remains mandatory in both UI and backend validation.
+   - Common certificate types are seeded so a fresh installation does not show an unusable empty certificate list.
+   - Registry creation and registry suspension/restoration by department managers are submitted for Institution Manager approval.
+
+5. Study departments
+   - A study department can now have an official teacher as its head.
+   - The Administration department can propose a study department and its head from Central Setup.
+
+6. Approval policy
+   - Structural, master-data and official-registry changes require Institution Manager approval when submitted by a department manager.
+   - Existing staffing requests and finance approval logic remain integrated.
+   - Routine daily work stays inside the responsible department to avoid turning the Institution Manager into a bottleneck for every small operational action.
+
+Why this is simpler
+-------------------
+- Fewer navigation choices.
+- One place for additions/configuration instead of multiple scattered forms.
+- One department page for each department manager.
+- One clear final approver for institution-level changes.
+- Department responsibilities remain separated: Finance handles finance, Administration handles central setup/registry coordination, Academic Affairs handles academic operations, and so on.
+- Existing social/chat functionality is preserved and not mixed into institution governance.
+
+Database upgrade
+----------------
+Run DATABASE_MIGRATION_2026_10_31.sql after the 2026-10-30 migration on an existing installation. Back up the database first.

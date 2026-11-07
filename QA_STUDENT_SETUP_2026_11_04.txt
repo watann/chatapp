@@ -1,0 +1,22 @@
+Student setup and options UX — technical review, 2026-11-04
+
+Changed:
+- admin/options.php: four focused sections and native accessible expandable categories; study departments, organizational departments/workplaces, teacher certificates/specializations, pending approvals.
+- admin/api/configuration.php: whitelisted return navigation to the focused section; transaction for new study department + head assignment.
+- api/app/controller/WorkflowController.php: transaction for the corresponding department approval execution.
+- admin/student-ids.php: role-gated official student IDs, filtered/searchable and linked account status; copy only for available IDs.
+- admin/records.php, admin/registry-batches.php, admin/registry-batch.php, admin/index.php, admin/part/sidebar.php: navigation and explicit step-by-step ID guidance.
+- assets/css/app.css, admin/part/header.php: responsive styling and cache version.
+
+Invariants reviewed:
+1. No official issued IDs are generated while a registry list is draft/under administration review/under manager review.
+2. Registry clerk -> Administration head -> Manager final approval persists as before, with all-or-nothing records transaction.
+3. Signup matches issued ID + government identity number + birth date and only accepts status='available'.
+4. Only authorized roles can view official student ID list, and no identity number or birth date is displayed there.
+5. Student department options are selected from active, approved options, not arbitrary text.
+6. All 10 POST forms on options.php contain CSRF inputs.
+7. No new database tables/columns were added in this revision.
+
+Tests: all PHP files php -l; all JS files node --check. Runtime MySQL/php-mysqli not available, so NO live database integration or end-to-end browser approval test was performed. Do not treat syntax checks as proof of zero logic bugs.
+
+Known: Clipboard API requires a supported browser/context; displayed IDs can be manually copied otherwise. If DB upgrades dated 2026-10-31 and 2026-11-04 are absent, run them only on a backed-up/test database before these pages are used.

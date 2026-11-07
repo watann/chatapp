@@ -1,0 +1,21 @@
+CHATAPP SIMPLIFICATION QA REPORT - 2026-10-31
+==============================================
+
+Scope
+-----
+Static validation of the simplified institution-management build after the 2026-10-31 changes.
+
+Checks passed
+-------------
+- PHP syntax: 99 PHP files passed `php -l`.
+- JavaScript syntax: 12 JavaScript files passed `node --check`.
+- Translation coverage: 558 literal t(...) keys checked; 0 missing from the translation resources.
+- Prepared-statement bindings: 244 literal bind_param calls checked; 0 type/argument-count mismatches detected.
+- POST forms: 56 POST forms checked; 0 missing CSRF field/helper detected by static scan.
+- Fresh schema: 29 CREATE TABLE declarations checked.
+- Foreign keys: 71 FK references / 71 named FK constraints; 0 duplicate constraint names and 0 references to missing tables detected.
+- Simplification changes include central setup, department manager page, unified approval workflow, teacher certificate selection, academic department head assignment, and cross-department assignment safeguards.
+
+Important environment limitation
+--------------------------------
+The test container does not provide the PHP mysqli/PDO-MySQL extension or a MySQL/MariaDB server/client. Therefore a live database migration and browser-level end-to-end test could not be executed here. Before production deployment, back up the database, run DATABASE_MIGRATION_2026_10_31.sql on a staging copy, then test the approval flows with real accounts.
